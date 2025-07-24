@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Conteúdo - Lume</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/conteudo.css' %}">
+    {% endblock %}
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <a class="navbar-brand" href="/">Lume</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link text-white" href="{% url 'index' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{% url 'conteudo' %}">Conteúdo</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="metas.html">Metas e Check-in</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="diario.html">Diário</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="login.html">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+  
+    <div class="container conteudo-wrapper my-5">
+        <div class="row">
+            <div class="col-md-8 conteudo-central">
+                <h2>Conteúdo</h2>
+                <p>O vício em substâncias químicas é um desafio sério que afeta milhões de pessoas no mundo todo.</p>
+                <p>As drogas atuam diretamente no sistema nervoso central, alterando o comportamento, humor e percepção.</p>
+                <p>É importante buscar ajuda médica para tratar dependência química.</p>
+                <p>O tratamento pode envolver terapias, apoio familiar, grupos de apoio como o NA (Narcóticos Anônimos), e em alguns casos, internação.</p>
+                <p>Você não está sozinho(a). A recuperação é possível com apoio e acompanhamento.</p>
+            </div>
+
+
+            <div class="col-md-4 ajuda bg-light p-3 rounded">
+                <h4>Busque ajuda</h4>
+                <ul class="list-unstyled ajuda-itens">
+                    <li>
+            <a href="https://www.gov.br/saude/pt-br/composicao/saes/desmad/raps/caps" target="_blank">
+                <strong>CAPS</strong> (Centros de Atenção Psicossocial)
+            </a>
+        </li>
+        <li>
+            <a href="https://www.na.org.br/" target="_blank">
+                <strong>NA</strong> (Narcóticos Anônimos)
+            </a>
+        </li>
+        <li>
+            <a href="https://www.gov.br/saude/pt-br/assuntos/novo-pac-saude/etapa-da-selecao-2025/unidades-basicas-de-saude" target="_blank">
+                <strong>UBS</strong> (Unidades Básicas de Saúde)
+            </a>
+        </li>
+        <li>
+                <strong>Linha 132:</strong> Apoio Gratuito
+        </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-4 bg-light mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 mb-2"><strong>Lume</strong><br>© 2025 Lume</div>
+                <div class="col-md-3 mb-2">
+                    <strong>Redes</strong><br>
+                    <img src="https://img.icons8.com/ios/50/instagram-new--v1.png" width="25" />
+                    <img src="https://img.icons8.com/ios/50/twitter--v1.png" width="25" />
+                </div>
+                <div class="col-md-3 mb-2">
+                    <strong>Contate-nos</strong><br>
+                    <img src="https://img.icons8.com/ios/50/phone.png" width="25" />
+                    <img src="https://img.icons8.com/ios/50/new-post.png" width="25" />
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</body>
+</html>

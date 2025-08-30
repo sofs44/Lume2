@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Gerenciar Pacientes</h2>
+<form method="GET">
+    <label for="paciente">Escolha um paciente:</label>
+    <select name="paciente_id">
+        {% for paciente in pacientes %}
+            <option value="{{ paciente.id }}">{{ paciente.nome }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Ver</button>
+</form>
+
+{% if metas %}
+    <h3>Metas de {{ paciente.nome }}</h3>
+    <ul>
+        {% for meta in metas %}
+            <li>{{ meta.descricao }} - {{ meta.data_criacao }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'criar_meta' paciente.id %}">Nova meta</a>
+{% endif %}
+
+</body>
+</html>

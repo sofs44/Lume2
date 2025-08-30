@@ -1,0 +1,57 @@
+/* auth.css */
+
+body {
+  margin: 0; padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #e6fff2, #d9f2e6);
+  height: 100vh; display: flex; align-items: center; justify-content: center;
+}
+
+.auth-container {
+  background: #fff; padding: 30px;
+  border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  width: 100%; max-width: 400px;
+}
+
+.tabs {
+  display: flex; margin-bottom: 20px;
+}
+
+.tabs button {
+  flex: 1; padding: 10px;
+  border: none; background: #c8e6c9;
+  cursor: pointer; font-weight: bold;
+  transition: background 0.3s;
+}
+
+.tabs button.active { background: #388e3c; color: #fff; }
+
+.pane { display: block; }
+.hidden { display: none; }
+
+.auth-container form {
+  display: flex; flex-direction: column;
+}
+
+.auth-container input,
+.auth-container select {
+  margin-bottom: 15px; padding: 10px;
+  border: 1px solid #b2dfdb; border-radius: 8px;
+}
+
+.auth-container button[name="btn-login"],
+.auth-container button[name="btn-cadastro"] {
+  background: #2e7d32; color: #fff;
+  border: none; padding: 12px;
+  border-radius: 8px; cursor: pointer;
+  font-size: 16px; transition: background 0.3s;
+}
+
+.auth-container button:hover { background: #1b5e20; }
+
+.tipo-usuario { margin: 10px 0; }
+.tipo-usuario label { margin-right: 10px; cursor: pointer; }
+
+.msgs { list-style: none; padding: 0; margin-top: 20px; }
+.msgs li { background: #ffebee; color: #b71c1c;
+           padding: 8px; border-radius: 6px; margin-bottom: 8px; }

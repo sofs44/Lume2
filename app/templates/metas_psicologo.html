@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Metas — Psicólogo{% endblock %}
+{% block content %}
+<h2>Metas — Painel do Psicólogo</h2>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="post" class="form-metacreate">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="col-md-6">
+          <label>Destinatário</label>
+          <select name="usuario_id" class="form-control">
+            <option value="all">Todos os usuários</option>
+            {% for u in usuarios %}
+              <option value="{{ u.id }}">{{ u.nome }} — {{ u.email }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label>Status inicial</label>
+          <select name="status" class="form-control">
+            <option value="aberta">Aberta</option>
+            <option value="em_andamento">Em andamento</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group mt-3">
+        <label>Descrição</label>
+        <textarea name="descricao" rows="2" class="form-control" placeholder="Descreva a meta..."></textarea>
+      </div>
+
+      <button class="btn btn-success">Criar meta</button>
+    </form>
+  </div>
+</div>
+
+<h4>Metas criadas</h4>
+<ul class="list-group">
+  {% for m in metas %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+        <strong>{{ m.usuario.nome }}</strong> — {{ m.descricao }} <br>
+        <small class="text-muted">{{ m.data_criacao }}</small>
+      </div>
+      <span class="badge badge-pill badge-secondary">{{ m.status }}</span>
+    </li>
+  {% empty %}
+    <li class="list-group-item">Sem metas por enquanto.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

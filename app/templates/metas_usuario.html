@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Minhas Metas{% endblock %}
+{% block content %}
+<h2>Minhas Metas</h2>
+
+<ul class="list-group">
+  {% for m in metas %}
+    <li class="list-group-item">
+      <div class="d-flex justify-content-between">
+        <div>
+          {{ m.descricao }}<br>
+          <small class="text-muted">Definida por: {{ m.psicologo.nome }} em {{ m.data_criacao }}</small>
+        </div>
+        <div>
+          <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="meta_id" value="{{ m.id }}">
+            {% if m.status != 'concluida' %}
+              <button name="marcar_concluida" class="btn btn-sm btn-success">Marcar como concluída</button>
+            {% else %}
+              <span class="badge badge-success">Concluída</span>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+    </li>
+  {% empty %}
+    <li class="list-group-item">Você não tem metas no momento.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

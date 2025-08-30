@@ -1,12 +1,25 @@
 from django.db import models
 from django.contrib.auth.models import User
+TIPO_CHOICES = [
+    ('comum', 'Comum'),
+    ('psicologo', 'Psicólogo'),
+]
+
 
 class Usuario(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome do usuário")
     email = models.EmailField(max_length=100, unique=True, verbose_name="E-mail do usuário")
     senha = models.CharField(max_length=10, verbose_name="Senha do usuário")
     data_nasc = models.DateField(verbose_name="Data de nascimento")
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='usuario')
+    psicologo = models.OneToOneField('Psicologo', on_delete=models.SET_NULL, null=True, blank=True)
 
+    TIPO_CHOICES = [
+        ('usuario', 'Usuário Comum'),
+        ('psicologo', 'Psicólogo'),
+    ]
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='usuario')
     def __str__(self):
         return self.nome
 
@@ -27,16 +40,12 @@ class Psicologo(models.Model):
         verbose_name_plural = "Psicólogos"
 
 class Diario(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, verbose_name="Diário do usuário")
-    texto = models.TextField(verbose_name="Texto do diário") 
-    data_criacao = models.DateTimeField(auto_now_add=True, verbose_name="Data de criação")
-
-    def __str__(self):
-        return f"Diário de {self.usuario.nome} em {self.data_criacao.date()}"
-
-    class Meta:
-        verbose_name = "Registro de Diário"
-        verbose_name_plural = "Registros de Diário"
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=100, blank=True, null=True)
+    conteudo = models.TextField(default="Sem conteúdo")
+    emocao = models.CharField(max_length=5)    
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
 
 class CheckinEmocional(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, verbose_name="Check-in do usuário")

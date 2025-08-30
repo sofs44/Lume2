@@ -3,16 +3,18 @@
 <html lang="pt-BR">
 {% load static %}
 <head>
+{% extends "base.html" %}
+{% block title %}Conteúdo - Lume{% endblock %}
     <meta charset="UTF-8">
     <title>Conteúdo - Lume</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/conteudo.css' %}">
-    {% endblock %}
+
 </head>
 
 <body>
-
+{% block content %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
         <a class="navbar-brand" href="/">Lume</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
@@ -25,8 +27,7 @@
                 <li class="nav-item"><a class="nav-link text-white" href="{% url 'index' %}">Home</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="{% url 'conteudo' %}">Conteúdo</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="metas.html">Metas e Check-in</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="diario.html">Diário</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="login.html">Login</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{% url 'diario' %}">Diário</a></li>
             </ul>
         </div>
     </nav>
@@ -86,11 +87,11 @@
                 </div>
             </div>
         </div>
+{% endblock %}
     </footer>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
 </body>
 </html>

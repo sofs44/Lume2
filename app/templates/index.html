@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lume - Página Inicial</title>
-
+{% extends "base.html" %}
+{% block title %}Lume - Página Inicial{% endblock %}
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     {% load static %}
@@ -26,13 +27,12 @@
                 <li class="nav-item"><a class="nav-link text-white" href="{% url 'index' %}">Home</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="{% url 'conteudo' %}">Conteúdo</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="metas.html">Metas e Check-in</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="diario.html">Diário</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="login.html">Login</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="{% url 'diario' %}">Diário</a></li>
             </ul>
         </div>
     </nav>
 
-
+{% block content %}
     <div class="container mt-5">
         <div class="jumbotron text-center">
             <h1 class="display-4">{{ frase }}</h1>
@@ -78,6 +78,7 @@
                 </div>
             </div>
         </div>
+{% endblock %}
     </footer>
 
 

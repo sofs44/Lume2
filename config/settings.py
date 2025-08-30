@@ -17,6 +17,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 # o template usado
@@ -89,8 +91,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+LOGIN_URL = '/login/'

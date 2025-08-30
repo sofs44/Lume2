@@ -1,24 +1,39 @@
+# config/urls.py
+
 from django.contrib import admin
 from django.urls import path
-from app.views import IndexView, DiarioView, CheckinView, MetasView, LoginView
-from app.views import ConteudoView
-from django.conf import settings
-from django.conf.urls.static import static
+from django.contrib.auth import logout
+from django.shortcuts import redirect
 from app import views
+
+
+
+from app.views import (
+    AuthView, IndexView, DiarioView, criar_diario, DeleteDiarioView,
+    EditDiarioView, CheckinView, ConteudoView,
+    listar_notificacoes, minhas_favoritas,
+    metas_checkin_redirect, metas_usuario, metas_psicologo
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', IndexView.as_view(), name='index'),
+
+    # ROTA DE LOGIN/CADASTRO unificada:
+    path('', AuthView.as_view(), name='auth'),
+    path('logout/', lambda r: (logout(r), redirect('auth'))[1], name='logout'),
+
+    # Demais rotas da sua aplicação:
+    path('index/', IndexView.as_view(), name='index'),
     path('diario/', DiarioView.as_view(), name='diario'),
+    path('diario/criar/', criar_diario, name='criar_diario'),
+    path('delete/<int:id>/', DeleteDiarioView.as_view(), name='delete'),
+    path('edit/<int:id>/', EditDiarioView.as_view(), name='edit_diario'),
     path('checkin/', CheckinView.as_view(), name='checkin'),
-    path('metas/', MetasView.as_view(), name='metas'),
-    path('login/', LoginView.as_view(), name='login'),
     path('conteudo/', ConteudoView.as_view(), name='conteudo'),
-    path('notificacoes/', views.listar_notificacoes, name='listar_notificacoes'),
-    path('favoritas/', views.minhas_favoritas, name='minhas_favoritas'),
+    path('notificacoes/', listar_notificacoes, name='listar_notificacoes'),
+    path('favoritas/', minhas_favoritas, name='minhas_favoritas'),
+    path('metas/', metas_checkin_redirect, name='metas'),
+    path('metas/usuario/', metas_usuario, name='metas_usuario'),
+    path('metas/psicologo/', metas_psicologo, name='metas_psicologo'),
 
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-

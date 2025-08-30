@@ -1,17 +1,39 @@
-from django.contrib import admin
 from .models import *
 from django.contrib import admin
+from .models import (
+    Usuario, Psicologo, Diario, CheckinEmocional, MetaTerapeutica,
+    FraseMotivacional, Notificacao, FraseFavorita
+)
 
-admin.site.register(Usuario)
-admin.site.register(Psicologo)
-admin.site.register(Diario)
-admin.site.register(CheckinEmocional)
-admin.site.register(MetaTerapeutica)
-admin.site.register(FraseMotivacional)
-admin.site.register(Notificacao)
+@admin.register(Usuario)
+class UsuarioAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Psicologo)
+class PsicologoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'email', 'registro_crp')
+
+@admin.register(Diario)
+class DiarioAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'titulo', 'emocao', 'data_criacao')
+    list_filter = ('usuario', 'emocao')
+    search_fields = ('titulo', 'conteudo', 'usuario__username')
+
+@admin.register(CheckinEmocional)
+class CheckinEmocionalAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(MetaTerapeutica)
+class MetaTerapeuticaAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(FraseMotivacional)
 class FraseMotivacionalAdmin(admin.ModelAdmin):
     list_display = ('id', 'texto')
 
+@admin.register(Notificacao)
+class NotificacaoAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(FraseFavorita)
 class FraseFavoritaAdmin(admin.ModelAdmin):

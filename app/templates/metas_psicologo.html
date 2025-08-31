@@ -1,53 +1,55 @@
-{% extends "base.html" %}
-{% block title %}Metas — Psicólogo{% endblock %}
-{% block content %}
-<h2>Metas — Painel do Psicólogo</h2>
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar Metas</title>
+    <link rel="stylesheet" href="{% static 'css/metas.css' %}">
+</head>
+<body>
+    <header>
+        <h1>📝 Gerenciar Metas dos Pacientes</h1>
+    </header>
 
-<div class="card mb-4">
-  <div class="card-body">
-    <form method="post" class="form-metacreate">
-      {% csrf_token %}
-      <div class="form-row">
-        <div class="col-md-6">
-          <label>Destinatário</label>
-          <select name="usuario_id" class="form-control">
-            <option value="all">Todos os usuários</option>
-            {% for u in usuarios %}
-              <option value="{{ u.id }}">{{ u.nome }} — {{ u.email }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-6">
-          <label>Status inicial</label>
-          <select name="status" class="form-control">
-            <option value="aberta">Aberta</option>
-            <option value="em_andamento">Em andamento</option>
-          </select>
-        </div>
-      </div>
+    <main>
+        <section class="form-meta">
+            <form method="post">
+                {% csrf_token %}
+                <label for="usuario">Paciente:</label>
+                <select name="usuario" id="usuario">
+                    {% for usuario in usuarios %}
+                        <option value="{{ usuario.id }}">{{ usuario.username }}</option>
+                    {% endfor %}
+                </select>
 
-      <div class="form-group mt-3">
-        <label>Descrição</label>
-        <textarea name="descricao" rows="2" class="form-control" placeholder="Descreva a meta..."></textarea>
-      </div>
+                <label for="titulo">Título da Meta:</label>
+                <input type="text" name="titulo" id="titulo" required>
 
-      <button class="btn btn-success">Criar meta</button>
-    </form>
-  </div>
-</div>
+                <label for="descricao">Descrição:</label>
+                <textarea name="descricao" id="descricao" required></textarea>
 
-<h4>Metas criadas</h4>
-<ul class="list-group">
-  {% for m in metas %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      <div>
-        <strong>{{ m.usuario.nome }}</strong> — {{ m.descricao }} <br>
-        <small class="text-muted">{{ m.data_criacao }}</small>
-      </div>
-      <span class="badge badge-pill badge-secondary">{{ m.status }}</span>
-    </li>
-  {% empty %}
-    <li class="list-group-item">Sem metas por enquanto.</li>
-  {% endfor %}
-</ul>
-{% endblock %}
+                <button type="submit">Criar Meta</button>
+            </form>
+        </section>
+
+        <section class="meta-lista">
+            <h2>Metas já criadas</h2>
+            {% if metas %}
+                <ul>
+                    {% for meta in metas %}
+                        <li>
+                            <h3>{{ meta.titulo }} ({{ meta.usuario.username }})</h3>
+                            <p>{{ meta.descricao }}</p>
+                            <small>Criada em {{ meta.data_criacao|date:"d/m/Y" }}</small>
+                            <a href="{% url 'editar_meta' meta.id %}" class="btn-editar">Editar</a>
+                            <a href="{% url 'excluir_meta' meta.id %}" class="btn-excluir">Excluir</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Nenhuma meta criada ainda.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

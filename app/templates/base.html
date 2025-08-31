@@ -1,4 +1,4 @@
-{% load static %}
+{% load static %} 
 <!doctype html>
 <html lang="pt-br">
 <head>
@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{% block title %}Lume{% endblock %}</title>
 
-  <!-- Bootstrap (CDN ou local) -->
+  <!-- Bootstrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-  <!-- Seu CSS global -->
+  <!-- CSS global -->
   <link rel="stylesheet" href="{% static 'css/index.css' %}">
   <link rel="stylesheet" href="{% static 'css/metas.css' %}">
 
@@ -17,7 +17,7 @@
 </head>
 <body>
 
-  <!-- NAVBAR centralizada aqui -->
+  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-success">
     <a class="navbar-brand" href="{% url 'index' %}">Lume</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
@@ -29,8 +29,8 @@
         <li class="nav-item"><a class="nav-link text-white" href="{% url 'index' %}">Home</a></li>
         <li class="nav-item"><a class="nav-link text-white" href="{% url 'conteudo' %}">Conteúdo</a></li>
 
-        <!-- link único para metas: a view 'metas' redireciona para psicologo/usuario -->
         {% if request.user.is_authenticated %}
+          <!-- link único, view decide se vai para metas_usuario ou metas_psicologo -->
           <li class="nav-item"><a class="nav-link text-white" href="{% url 'metas' %}">Metas e Check-in</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="{% url 'diario' %}">Diário</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="{% url 'logout' %}">Sair</a></li>
@@ -41,12 +41,12 @@
     </div>
   </nav>
 
-  <!-- Área principal que as páginas vão preencher -->
+  <!-- Conteúdo -->
   <main class="container my-5">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Footer comum -->
+  <!-- Footer -->
   <footer class="text-center py-4 bg-light mt-5">
     <div class="container">
       <div class="row">
@@ -63,7 +63,7 @@
     </div>
   </footer>
 
-  <!-- JS (CDN) -->
+  <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

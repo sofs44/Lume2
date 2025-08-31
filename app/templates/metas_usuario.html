@@ -1,31 +1,32 @@
-{% extends "base.html" %}
-{% block title %}Minhas Metas{% endblock %}
-{% block content %}
-<h2>Minhas Metas</h2>
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Minhas Metas</title>
+    <link rel="stylesheet" href="{% static 'css/metas.css' %}">
+</head>
+<body>
+    <header>
+        <h1>🎯 Minhas Metas Terapêuticas</h1>
+    </header>
 
-<ul class="list-group">
-  {% for m in metas %}
-    <li class="list-group-item">
-      <div class="d-flex justify-content-between">
-        <div>
-          {{ m.descricao }}<br>
-          <small class="text-muted">Definida por: {{ m.psicologo.nome }} em {{ m.data_criacao }}</small>
-        </div>
-        <div>
-          <form method="post" style="display:inline;">
-            {% csrf_token %}
-            <input type="hidden" name="meta_id" value="{{ m.id }}">
-            {% if m.status != 'concluida' %}
-              <button name="marcar_concluida" class="btn btn-sm btn-success">Marcar como concluída</button>
+    <main>
+        <section class="meta-lista">
+            {% if metas %}
+                <ul>
+                    {% for meta in metas %}
+                        <li>
+                            <h3>{{ meta.titulo }}</h3>
+                            <p>{{ meta.descricao }}</p>
+                            <small>Criada em {{ meta.data_criacao|date:"d/m/Y" }}</small>
+                        </li>
+                    {% endfor %}
+                </ul>
             {% else %}
-              <span class="badge badge-success">Concluída</span>
+                <p>Você ainda não possui metas definidas pelo psicólogo.</p>
             {% endif %}
-          </form>
-        </div>
-      </div>
-    </li>
-  {% empty %}
-    <li class="list-group-item">Você não tem metas no momento.</li>
-  {% endfor %}
-</ul>
-{% endblock %}
+        </section>
+    </main>
+</body>
+</html>

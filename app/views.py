@@ -232,6 +232,11 @@ class EditDiarioView(View):
 
 @login_required
 def metas_checkin_redirect(request):
+    usuario = get_object_or_404(Usuario, user=request.user)
+    if usuario.tipo == 'psicologo':
+        return redirect('metas_psicologo')
+    else:
+        return redirect('metas_usuario')
     try:
         request.user.psicologo
         return redirect('metas_psicologo')

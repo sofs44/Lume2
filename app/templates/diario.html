@@ -1,90 +1,53 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-{% load static %}
 {% extends "base.html" %}
-{% block title %}Conteúdo - Lume{% endblock %}
+{% load static %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Lume - Diário</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-    {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/diario.css' %}">
-    {% endblock %}
-</head>
+{% block title %}Diário - Lume{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/diario.css' %}">
+{% endblock %}
 
-<body>
-    <!-- Navbar -->
 {% block content %}
-
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-            <a class="navbar-brand" href="/">Lume</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'index' %}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'conteudo' %}">Conteúdo</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="metas.html">Metas e Check-in</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{% url 'diario' %}">Diário</a></li>                </ul>
+<form method="post" action="{% url 'criar_diario' %}">
+    {% csrf_token %}
+    <div class="diario-box">
+        <div class="diario-header">
+            <span class="data">{{ data_hoje }}</span>
+            <input type="text" name="titulo" class="titulo" placeholder="Título (opcional)">
+            <div class="emojis">
+                <button type="button" class="emoji" data-emoji="😊">😊</button>
+                <button type="button" class="emoji" data-emoji="😐">😐</button>
+                <button type="button" class="emoji" data-emoji="😢">😢</button>
+                <button type="button" class="emoji" data-emoji="😠">😠</button>
             </div>
-        </nav>
-    </header>
-
-
-    <!-- Área de entrada do diário -->
-    <main class="container">
-        <form method="post" action="{% url 'criar_diario' %}">
-            {% csrf_token %}
-            <div class="diario-box">
-                <div class="diario-header">
-                    <span class="data">{{ data_hoje }}</span>
-                    <input type="text" name="titulo" class="titulo" placeholder="Título (opcional)">
-                    <div class="emojis">
-                        <button type="button" class="emoji" data-emoji="😊">😊</button>
-                        <button type="button" class="emoji" data-emoji="😐">😐</button>
-                        <button type="button" class="emoji" data-emoji="😢">😢</button>
-                        <button type="button" class="emoji" data-emoji="😠">😠</button>
-                    </div>
-                    <input type="hidden" name="emoji" id="emojiSelecionado">
-                </div>
-                <textarea name="texto" placeholder="Digite" class="texto"></textarea>
-                <button type="submit" class="salvar-btn">Salvar</button>
-            </div>
-        </form>
-
-
-        <!-- Registros anteriores -->
-        {% for registro in diarios %}
-        <div class="registro">
-            <span class="data">{{ registro.data_criacao|date:"d/m/Y" }}
-                {% if registro.titulo %} - <strong>{{ registro.titulo }}</strong>{% endif %}
-            </span>
-            <p class="conteudo">{{ registro.texto }}</p>
-            <div class="acoes">
-                <a href="{% url 'edit_diario' registro.id %}"><button class="editar-btn">Editar</button></a>
-                <a href="{% url 'delete' registro.id %}"><button class="excluir-btn">Excluir</button></a>
-            </div>
+            <input type="hidden" name="emoji" id="emojiSelecionado">
         </div>
-        {% endfor %}
-        {% endblock %}
+        <textarea name="texto" placeholder="Digite" class="texto"></textarea>
+        <button type="submit" class="salvar-btn">Salvar</button>
+    </div>
+</form>
 
-    </main>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% for registro in diarios %}
+<div class="registro">
+    <span class="data">
+        {{ registro.data_criacao|date:"d/m/Y" }}
+        {% if registro.titulo %} - <strong>{{ registro.titulo }}</strong>{% endif %}
+    </span>
+    <p class="conteudo">{{ registro.conteudo }}</p>
+    <div class="acoes">
+        <a href="{% url 'edit_diario' registro.id %}"><button class="editar-btn" type="button">Editar</button></a>
+        <a href="{% url 'delete' registro.id %}"><button class="excluir-btn" type="button">Excluir</button></a>
+    </div>
+</div>
+{% empty %}
+<p>Sem registros ainda.</p>
+{% endfor %}
+{% endblock %}
 
-</body>
-
+{% block extra_js %}
 <script>
     const emojiButtons = document.querySelectorAll('.emoji');
     const emojiInput = document.getElementById('emojiSelecionado');
-
     emojiButtons.forEach(button => {
         button.addEventListener('click', () => {
             emojiButtons.forEach(btn => btn.classList.remove('selecionado'));
@@ -93,6 +56,4 @@
         });
     });
 </script>
-
-
-</html>
+{% endblock %}

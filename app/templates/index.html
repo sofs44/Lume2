@@ -14,8 +14,10 @@
 
 <div class="container my-5">
   <div class="row justify-content-center text-center">
+    <!-- index.html: troque os href dos cards -->
     <div class="col-md-3 mb-4">
-      <a href="{% url 'metas' %}" style="text-decoration: none; color: inherit;">
+      <a href="{% if user.is_authenticated %}{% url 'metas' %}{% else %}{% url 'auth' %}{% endif %}"
+        style="text-decoration:none;color:inherit;">
         <div class="card shadow">
           <div class="card-body">
             <h5>Metas e Check-in</h5>
@@ -26,7 +28,8 @@
     </div>
 
     <div class="col-md-3 mb-4">
-      <a href="{% url 'diario' %}" style="text-decoration: none; color: inherit;">
+      <a href="{% if user.is_authenticated %}{% url 'diario' %}{% else %}{% url 'auth' %}{% endif %}"
+        style="text-decoration:none;color:inherit;">
         <div class="card shadow">
           <div class="card-body">
             <h5>Diário Pessoal</h5>
@@ -35,6 +38,7 @@
         </div>
       </a>
     </div>
+
   </div>
 </div>
 {% endblock %}

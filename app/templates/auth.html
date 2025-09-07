@@ -11,8 +11,8 @@
 <body>
   <div class="auth-container">
     <div class="tabs">
-      <button name="btn-login" type="submit">Entrar</button>
-      <button name="btn-cadastro" type="submit">Cadastrar</button>
+      <button id="tab-login" type="button" class="active">Entrar</button>
+      <button id="tab-cadastro" type="button">Cadastrar</button>
     </div>
 
     <!-- PAINEL DE LOGIN -->
@@ -21,9 +21,7 @@
         {% csrf_token %}
         {{ login_form.username|as_crispy_field }}
         {{ login_form.password|as_crispy_field }}
-        <div class="tipo-usuario">
-          {{ login_form.tipo }}
-        </div>
+        <div class="tipo-usuario">{{ login_form.tipo }}</div>
         <button name="btn-login" type="submit">Entrar</button>
       </form>
     </div>
@@ -37,13 +35,27 @@
         {{ cadastro_form.nome|as_crispy_field }}
         {{ cadastro_form.email|as_crispy_field }}
         {{ cadastro_form.data_nasc|as_crispy_field }}
-        <div class="tipo-usuario">
-          {{ cadastro_form.tipo }}
-        </div>
+        <div class="tipo-usuario">{{ cadastro_form.tipo }}</div>
         {{ cadastro_form.codigo|as_crispy_field }}
         <button name="btn-cadastro" type="submit">Cadastrar</button>
       </form>
     </div>
+
+    <script>
+      const loginTab = document.getElementById('tab-login');
+      const cadTab = document.getElementById('tab-cadastro');
+      const paneL = document.getElementById('pane-login');
+      const paneC = document.getElementById('pane-cadastro');
+
+      loginTab.onclick = () => {
+        loginTab.classList.add('active'); cadTab.classList.remove('active');
+        paneL.classList.remove('hidden'); paneC.classList.add('hidden');
+      };
+      cadTab.onclick = () => {
+        cadTab.classList.add('active'); loginTab.classList.remove('active');
+        paneC.classList.remove('hidden'); paneL.classList.add('hidden');
+      };
+    </script>
 
     {% if messages %}
     <ul class="msgs">
@@ -53,22 +65,5 @@
     </ul>
     {% endif %}
   </div>
-
-  <script>
-    const loginTab = document.getElementById('tab-login'),
-      cadTab = document.getElementById('tab-cadastro'),
-      paneL = document.getElementById('pane-login'),
-      paneC = document.getElementById('pane-cadastro');
-
-    loginTab.onclick = () => {
-      loginTab.classList.add('active'); cadTab.classList.remove('active');
-      paneL.classList.remove('hidden'); paneC.classList.add('hidden');
-    };
-    cadTab.onclick = () => {
-      cadTab.classList.add('active'); loginTab.classList.remove('active');
-      paneC.classList.remove('hidden'); paneL.classList.add('hidden');
-    };
-  </script>
 </body>
-
 </html>

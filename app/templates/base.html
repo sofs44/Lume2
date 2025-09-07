@@ -1,6 +1,7 @@
-{% load static %} 
+{% load static %}
 <!doctype html>
 <html lang="pt-br">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -15,6 +16,7 @@
 
   {% block extra_css %}{% endblock %}
 </head>
+
 <body>
 
   <!-- NAVBAR -->
@@ -26,18 +28,20 @@
 
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
       <ul class="navbar-nav">
+        {% if user.is_authenticated %}
         <li class="nav-item"><a class="nav-link text-white" href="{% url 'index' %}">Home</a></li>
         <li class="nav-item"><a class="nav-link text-white" href="{% url 'conteudo' %}">Conteúdo</a></li>
-
-        {% if request.user.is_authenticated %}
-          <!-- link único, view decide se vai para metas_usuario ou metas_psicologo -->
-          <li class="nav-item"><a class="nav-link text-white" href="{% url 'metas' %}">Metas e Check-in</a></li>
-          <li class="nav-item"><a class="nav-link text-white" href="{% url 'diario' %}">Diário</a></li>
-          <li class="nav-item"><a class="nav-link text-white" href="{% url 'logout' %}">Sair</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{% url 'metas' %}">Metas e Check-in</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{% url 'diario' %}">Diário</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{% url 'logout' %}">Sair</a></li>
         {% else %}
-          <li class="nav-item"><a class="nav-link text-white" href="{% url 'auth' %}">Entrar / Cadastrar</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{% url 'index' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{% url 'conteudo' %}">Conteúdo</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{% url 'auth' %}">Entrar / Cadastrar</a></li>
         {% endif %}
       </ul>
+
+
     </div>
   </nav>
 
@@ -70,4 +74,5 @@
 
   {% block extra_js %}{% endblock %}
 </body>
+
 </html>

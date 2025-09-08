@@ -1,17 +1,21 @@
-from django.urls import path
-from .views import AuthView, IndexView, ConteudoView, CheckinView, DiarioView, criar_diario, DeleteDiarioView, EditDiarioView, listar_notificacoes, minhas_favoritas, metas_checkin_redirect, metas_psicologo, metas_usuario
+from django.urls import path, include
+from django.contrib import admin
+from app.views import AuthView, IndexView, ConteudoView, CheckinView, DiarioView, criar_diario, DeleteDiarioView, EditDiarioView, listar_notificacoes, minhas_favoritas, metas_checkin_redirect, metas_psicologo, metas_usuario
+from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
     path('', IndexView.as_view(), name='index'),
     path('auth/', AuthView.as_view(), name='auth'),
-    path('', include('app.urls')),
+    path('logout/', auth_views.LogoutView.as_view(next_page='index'), name='logout'),
     path('conteudo/', ConteudoView.as_view(), name='conteudo'),
     path('checkin/', CheckinView.as_view(), name='checkin'),
 
     path('diario/', DiarioView.as_view(), name='diario'),
     path('diario/criar/', criar_diario, name='criar_diario'),
-    path('diario/<int:id>/delete/', DeleteDiarioView.as_view(), name='delete_diario'),
-    path('diario/<int:id>/edit/', EditDiarioView.as_view(), name='edit_diario'),
+    path('diario/editar/<int:id>/', EditDiarioView.as_view(), name='edit_diario'),
+    path('diario/excluir/<int:id>/', DeleteDiarioView.as_view(), name='delete_diario'),
 
     path('notificacoes/', listar_notificacoes, name='notificacoes'),
     path('favoritas/', minhas_favoritas, name='favoritas'),

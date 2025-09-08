@@ -29,3 +29,46 @@ body {
     text-decoration: underline;
   }
   
+  button.nav-link:focus {
+    box-shadow: none;
+  }
+  
+  /* Botão "Sair" na navbar */
+.logout-button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem; /* igual ao link da navbar */
+  margin: 0;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+}
+
+.logout-button:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+.logout-button:focus,
+.logout-button:active {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Forçar o botão "Sair" a se comportar exatamente como os links */
+.navbar .logout-button.nav-link {
+  color: #fff !important;
+  background: none !important;
+  border: none !important;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.navbar .logout-button.nav-link:hover {
+  color: #fff !important;
+  text-decoration: underline;
+}

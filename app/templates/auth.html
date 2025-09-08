@@ -17,7 +17,7 @@
 
     <!-- PAINEL DE LOGIN -->
     <div id="pane-login" class="pane">
-      <form method="post">
+      <form method="post" action="">
         {% csrf_token %}
         {{ login_form.username|as_crispy_field }}
         {{ login_form.password|as_crispy_field }}
@@ -28,7 +28,7 @@
 
     <!-- PAINEL DE CADASTRO -->
     <div id="pane-cadastro" class="pane hidden">
-      <form method="post">
+      <form method="post" action="">
         {% csrf_token %}
         {{ cadastro_form.username|as_crispy_field }}
         {{ cadastro_form.password|as_crispy_field }}

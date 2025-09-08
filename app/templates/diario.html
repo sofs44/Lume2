@@ -36,7 +36,10 @@
     <p class="conteudo">{{ registro.conteudo }}</p>
     <div class="acoes">
         <a href="{% url 'edit_diario' registro.id %}"><button class="editar-btn" type="button">Editar</button></a>
-        <a href="{% url 'delete' registro.id %}"><button class="excluir-btn" type="button">Excluir</button></a>
+        <a href="{% url 'delete_diario' registro.id %}">
+            <button class="excluir-btn" type="button">Excluir</button>
+        </a>
+        
     </div>
 </div>
 {% empty %}

@@ -1,32 +1,51 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Minhas Metas</title>
-    <link rel="stylesheet" href="{% static 'css/metas.css' %}">
-</head>
-<body>
-    <header>
-        <h1>🎯 Minhas Metas Terapêuticas</h1>
-    </header>
+{% extends 'base.html' %}
 
-    <main>
-        <section class="meta-lista">
-            {% if metas %}
-                <ul>
-                    {% for meta in metas %}
-                        <li>
-                            <h3>{{ meta.titulo }}</h3>
-                            <p>{{ meta.descricao }}</p>
-                            <small>Criada em {{ meta.data_criacao|date:"d/m/Y" }}</small>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Você ainda não possui metas definidas pelo psicólogo.</p>
-            {% endif %}
-        </section>
-    </main>
-</body>
-</html>
+{% block title %}Metas e Check-in{% endblock %}
+
+{% block content %}
+<div class="metas-checkin-container">
+  
+  <!-- Lista de metas -->
+  <div class="metas">
+    {% if metas %}
+      {% for meta in metas %}
+        <div class="meta">
+          <div>
+            <strong>{{ meta.descricao }}</strong>
+            <p>Status: {{ meta.status }}</p>
+          </div>
+          <form method="post" action="{% url 'metas_usuario' %}">
+            {% csrf_token %}
+            <input type="hidden" name="meta_id" value="{{ meta.id }}">
+            <input type="checkbox" name="marcar_concluida"
+              {% if meta.status == 'concluida' %} checked disabled {% endif %}
+              onchange="this.form.submit()">
+          </form>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>Você ainda não possui metas definidas pelo seu psicólogo.</p>
+    {% endif %}
+  </div>
+
+  <!-- Check-in emocional -->
+  <div class="checkin">
+    <div class="emojis">
+      <span onclick="mostrarJustificativa()">😢</span>
+      <span onclick="mostrarJustificativa()">😡</span>
+      <span onclick="mostrarJustificativa()">😐</span>
+      <span onclick="mostrarJustificativa()">😊</span>
+      <span onclick="mostrarJustificativa()">😁</span>
+    </div>
+    <textarea class="justificativa" placeholder="Escreva aqui o motivo da sua emoção..."></textarea>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function mostrarJustificativa() {
+    document.querySelector(".justificativa").classList.add("active");
+  }
+</script>
+{% endblock %}

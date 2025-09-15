@@ -1,0 +1,42 @@
+/* Estilo dos checkboxes das metas */
+.meta form input[type="checkbox"] {
+    appearance: none; /* remove estilo padrão */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 22px;
+    height: 22px;
+    border: 2px solid #28a745; /* verde */
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    background: #fff;
+    transition: background 0.2s, border 0.2s;
+}
+
+.meta form input[type="checkbox"]:checked {
+    background: #28a745; /* fundo verde quando marcado */
+    border-color: #28a745;
+}
+
+.meta form input[type="checkbox"]:checked::after {
+    content: "✔";
+    color: #fff;
+    font-size: 14px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+}
+
+/* Check-in continua com caixinha própria */
+.checkin {
+    flex: 1;
+    background: #e6fff0;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}

@@ -253,15 +253,32 @@ def metas_usuario(request):
     perfil = request.user.usuario
     metas = MetaTerapeutica.objects.filter(usuario=perfil).order_by('-data_criacao')
 
-    if request.method == 'POST' and 'marcar_concluida' in request.POST:
-        meta_id = request.POST.get('meta_id')
-        try:
-            meta = MetaTerapeutica.objects.get(id=meta_id, usuario=perfil)
-            meta.status = 'concluida'
-            meta.save()
-            messages.success(request, "Meta marcada como concluída.")
-        except MetaTerapeutica.DoesNotExist:
-            messages.error(request, "Meta inválida.")
+    if request.method == 'POST':
+        # 1. Marcar meta concluída
+        if request.POST.get('marcar_concluida'):
+            meta_id = request.POST.get('meta_id')
+            try:
+                meta = MetaTerapeutica.objects.get(id=meta_id, usuario=perfil)
+                meta.status = 'concluida'
+                meta.save()
+                messages.success(request, "Meta marcada como concluída.")
+            except MetaTerapeutica.DoesNotExist:
+                messages.error(request, "Meta inválida.")
+            return redirect('metas_usuario')
+
+        # 2. Salvar check-in emocional
+        if request.POST.get('humor'):
+            humor = request.POST.get('humor')
+            justificativa = request.POST.get('justificativa', '').strip()
+            CheckinEmocional.objects.create(
+                usuario=perfil,
+                humor=f"{humor} - {justificativa}" if justificativa else humor
+            )
+            messages.success(request, "Check-in salvo com sucesso!")
+            return redirect('metas_usuario')
+
+        # 3. Caso nenhum dos dois
+        messages.error(request, "Formulário inválido.")
         return redirect('metas_usuario')
 
     return render(request, 'metas_usuario.html', {'metas': metas})

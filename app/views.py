@@ -88,7 +88,11 @@ class AuthView(View):
             if login_form.is_valid():
                 user = login_form.cleaned_data['user_obj']
                 login(request, user)
-                return redirect('index')
+                perfil = user.usuario
+                if perfil.tipo == 'psicologo':
+                    return redirect('metas_psicologo')  # ou outra página inicial para psicólogo
+                else:
+                    return redirect('index')
             return render(request, 'auth.html', {
                 'login_form': login_form,
                 'cadastro_form': cadastro_form
@@ -209,6 +213,12 @@ def somente_psicologo(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
+# Função atualizada para metas_psicologo com dados reais de gráficos
+# Substitua a função metas_psicologo existente no seu views.py por esta versão
+
+# Função atualizada para metas_psicologo com dados reais de gráficos
+# Substitua a função metas_psicologo existente no seu views.py por esta versão
+
 @login_required
 @somente_psicologo
 def metas_psicologo(request):
@@ -222,10 +232,82 @@ def metas_psicologo(request):
 
     usuarios = Usuario.objects.filter(tipo='usuario').order_by('nome')
     metas = MetaTerapeutica.objects.filter(psicologo=psicologo_obj).order_by('-data_criacao')
+    
+    # Obter usuário selecionado (se houver)
+    usuario_selecionado_id = request.GET.get('usuario_id')
+    usuario_selecionado = None
+    if usuario_selecionado_id and usuario_selecionado_id != 'all':
+        try:
+            usuario_selecionado = Usuario.objects.get(id=int(usuario_selecionado_id))
+        except (Usuario.DoesNotExist, ValueError):
+            usuario_selecionado = None
+    
+    # Filtrar dados para o usuário selecionado ou todos os usuários
+    if usuario_selecionado:
+        # Dados específicos do usuário selecionado
+        checkins_usuario = CheckinEmocional.objects.filter(usuario=usuario_selecionado).order_by('-data')[:10]
+        diarios_usuario = Diario.objects.filter(usuario=usuario_selecionado).order_by('-data_criacao')[:10]
+        metas_filtradas = metas.filter(usuario=usuario_selecionado)
+    else:
+        # Dados de todos os usuários
+        checkins_usuario = CheckinEmocional.objects.filter(usuario__tipo='usuario').order_by('-data')[:10]
+        diarios_usuario = Diario.objects.filter(usuario__tipo='usuario').order_by('-data_criacao')[:10]
+        metas_filtradas = metas
+    
+    # Processar dados para os gráficos de check-in
+    dados_checkin = {
+        'muito_triste': 0,
+        'triste': 0,
+        'neutro': 0,
+        'feliz': 0,
+        'muito_feliz': 0
+    }
+    
+    for checkin in CheckinEmocional.objects.filter(
+        usuario=usuario_selecionado if usuario_selecionado else Usuario.objects.filter(tipo='usuario')
+    ):
+        humor_lower = checkin.humor.lower()
+        if 'muito-triste' in humor_lower or 'muito triste' in humor_lower:
+            dados_checkin['muito_triste'] += 1
+        elif 'triste' in humor_lower:
+            dados_checkin['triste'] += 1
+        elif 'neutro' in humor_lower:
+            dados_checkin['neutro'] += 1
+        elif 'muito-feliz' in humor_lower or 'muito feliz' in humor_lower:
+            dados_checkin['muito_feliz'] += 1
+        elif 'feliz' in humor_lower:
+            dados_checkin['feliz'] += 1
+        else:
+            dados_checkin['neutro'] += 1  # Default para neutro se não identificar
+    
+    # Processar dados para os gráficos de diário
+    dados_diario = {
+        'muito_triste': 0,
+        'triste': 0,
+        'neutro': 0,
+        'feliz': 0,
+        'muito_feliz': 0
+    }
+    
+    for diario in Diario.objects.filter(
+        usuario=usuario_selecionado if usuario_selecionado else Usuario.objects.filter(tipo='usuario')
+    ):
+        emocao = diario.emocao
+        if emocao == '😢':
+            dados_diario['muito_triste'] += 1
+        elif emocao == '😞':
+            dados_diario['triste'] += 1
+        elif emocao == '😐':
+            dados_diario['neutro'] += 1
+        elif emocao == '😊':
+            dados_diario['feliz'] += 1
+        elif emocao == '😄':
+            dados_diario['muito_feliz'] += 1
+        else:
+            dados_diario['neutro'] += 1  # Default para neutro
 
     if request.method == 'POST':
         descricao = request.POST.get('descricao', '').strip()
-        status = request.POST.get('status', 'aberta')
         target = request.POST.get('usuario_id')
 
         if not descricao:
@@ -234,19 +316,40 @@ def metas_psicologo(request):
 
         if target == 'all':
             for u in usuarios:
-                MetaTerapeutica.objects.create(psicologo=psicologo_obj, usuario=u, descricao=descricao, status=status)
+                MetaTerapeutica.objects.create(
+                    psicologo=psicologo_obj, 
+                    usuario=u, 
+                    descricao=descricao, 
+                    status='aberta'  # Status padrão
+                )
             messages.success(request, "Meta criada para todos os usuários.")
         else:
             try:
                 u = Usuario.objects.get(id=int(target))
-                MetaTerapeutica.objects.create(psicologo=psicologo_obj, usuario=u, descricao=descricao, status=status)
+                MetaTerapeutica.objects.create(
+                    psicologo=psicologo_obj, 
+                    usuario=u, 
+                    descricao=descricao, 
+                    status='aberta'  # Status padrão
+                )
                 messages.success(request, f"Meta criada para {u.nome}.")
             except (Usuario.DoesNotExist, ValueError):
                 messages.error(request, "Usuário selecionado inválido.")
 
         return redirect('metas_psicologo')
 
-    return render(request, 'metas_psicologo.html', {'usuarios': usuarios, 'metas': metas})
+    context = {
+        'usuarios': usuarios,
+        'metas': metas_filtradas,
+        'checkins_recentes': checkins_usuario,
+        'diarios_recentes': diarios_usuario,
+        'dados_checkin': dados_checkin,
+        'dados_diario': dados_diario,
+        'usuario_selecionado': usuario_selecionado,
+    }
+
+    return render(request, 'metas_psicologo.html', context)
+
 
 @login_required
 def metas_usuario(request):

@@ -1,55 +1,297 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Gerenciar Metas</title>
-    <link rel="stylesheet" href="{% static 'css/metas.css' %}">
-</head>
-<body>
-    <header>
-        <h1>📝 Gerenciar Metas dos Pacientes</h1>
-    </header>
 
-    <main>
-        <section class="form-meta">
-            <form method="post">
-                {% csrf_token %}
-                <label for="usuario">Paciente:</label>
-                <select name="usuario" id="usuario">
+{% block title %}Metas e Check-in - Psicólogo - Lume{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/metas_psicologo.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="psicologo-container">
+    <div class="row">
+        <!-- Coluna lateral com lista de usuários -->
+        <div class="col-lg-3 col-md-4">
+            <div class="usuarios-section">
+                <h5 class="usuarios-title">Pacientes</h5>
+                <div class="usuarios-grid">
                     {% for usuario in usuarios %}
-                        <option value="{{ usuario.id }}">{{ usuario.username }}</option>
+                    <div class="usuario-card {% if request.GET.usuario_id == usuario.id|stringformat:'s' %}selected{% endif %}"
+                        onclick="selecionarUsuario({{ usuario.id }}, '{{ usuario.nome }}')">
+                        <div class="usuario-avatar">
+                            {{ usuario.nome|first|upper }}
+                        </div>
+                        <div class="usuario-nome">{{ usuario.nome }}</div>
+                    </div>
                     {% endfor %}
-                </select>
 
-                <label for="titulo">Título da Meta:</label>
-                <input type="text" name="titulo" id="titulo" required>
+                    <!-- Opção para todos os usuários -->
+                    <div class="usuario-card todos-usuarios {% if not request.GET.usuario_id %}selected{% endif %}"
+                        onclick="selecionarTodosUsuarios()">
+                        <div class="usuario-avatar todos-avatar">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="usuario-nome"><strong>Todos os Usuários</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <label for="descricao">Descrição:</label>
-                <textarea name="descricao" id="descricao" required></textarea>
+        <!-- Coluna principal com metas e formulário -->
+        <div class="col-lg-6 col-md-8">
+            <div class="metas-section">
+                <!-- Formulário para adicionar nova meta -->
+                <div class="adicionar-meta-form">
+                    <h5 class="form-title">
+                        <span id="meta-target-text">
+                            {% if request.GET.usuario_id %}
+                            Adicionar meta para {{ request.GET.usuario_nome|default:"usuário selecionado" }}
+                            {% else %}
+                            Adicionar meta para todos os usuários
+                            {% endif %}
+                        </span>
+                    </h5>
 
-                <button type="submit">Criar Meta</button>
-            </form>
-        </section>
+                    <form method="post" class="meta-form">
+                        {% csrf_token %}
+                        <input type="hidden" id="usuario_id" name="usuario_id"
+                            value="{{ request.GET.usuario_id|default:'all' }}">
 
-        <section class="meta-lista">
-            <h2>Metas já criadas</h2>
-            {% if metas %}
-                <ul>
+                        <div class="form-group">
+                            <textarea name="descricao" class="form-control meta-textarea"
+                                placeholder="Descreva a meta terapêutica..." rows="3" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-adicionar">
+                            <i class="fas fa-plus"></i> Adicionar Meta
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Lista de metas existentes -->
+                <div class="metas-existentes">
+                    <h5 class="metas-title">Metas Criadas</h5>
+
+                    {% if metas %}
                     {% for meta in metas %}
-                        <li>
-                            <h3>{{ meta.titulo }} ({{ meta.usuario.username }})</h3>
-                            <p>{{ meta.descricao }}</p>
-                            <small>Criada em {{ meta.data_criacao|date:"d/m/Y" }}</small>
-                            <a href="{% url 'editar_meta' meta.id %}" class="btn-editar">Editar</a>
-                            <a href="{% url 'excluir_meta' meta.id %}" class="btn-excluir">Excluir</a>
-                        </li>
+                    <div class="meta-card">
+                        <div class="meta-header">
+                            <span class="meta-usuario">{{ meta.usuario.nome }}</span>
+                            <span class="meta-status status-{{ meta.status }}">
+                                {% if meta.status == 'concluida' %}Concluída{% else %}Em Andamento{% endif %}
+                            </span>
+                        </div>
+                        <div class="meta-content">
+                            <p class="meta-descricao">{{ meta.descricao }}</p>
+                            <small class="meta-data">Criada em {{ meta.data_criacao|date:"d/m/Y" }}</small>
+                        </div>
+                    </div>
                     {% endfor %}
-                </ul>
-            {% else %}
-                <p>Nenhuma meta criada ainda.</p>
-            {% endif %}
-        </section>
-    </main>
-</body>
-</html>
+                    {% else %}
+                    <div class="no-metas">
+                        <p>Nenhuma meta foi criada ainda.</p>
+                        <p>Use o formulário acima para adicionar a primeira meta.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna lateral direita com gráficos de emoções -->
+        <div class="col-lg-3 col-md-12">
+            <div class="graficos-section">
+                <!-- Gráfico de emoções do check-in -->
+                <div class="grafico-card">
+                    <h6 class="grafico-title">Gráfico mostrando suas emoções do check-in</h6>
+                    <div class="grafico-placeholder">
+                        <canvas id="grafico-checkin" width="250" height="200"></canvas>
+                    </div>
+
+                    <!-- Justificativas recentes -->
+                    <div class="justificativas-recentes">
+                        <h6 class="justificativas-title">Justificativas Recentes</h6>
+                        <div class="justificativas-list">
+                            {% if checkins_recentes %}
+                            {% for checkin in checkins_recentes %}
+                            <div class="justificativa-item">
+                                <div class="justificativa-emoji">
+                                    {% if 'muito-triste' in checkin.humor %}😢
+                                    {% elif 'triste' in checkin.humor %}😞
+                                    {% elif 'neutro' in checkin.humor %}😐
+                                    {% elif 'feliz' in checkin.humor %}😊
+                                    {% elif 'muito-feliz' in checkin.humor %}😄
+                                    {% else %}😐{% endif %}
+                                </div>
+                                <div class="justificativa-content">
+                                    <p class="justificativa-texto">
+                                        {% if ' - ' in checkin.humor %}
+                                        {{ checkin.humor|split:' - '|last }}
+                                        {% else %}
+                                        {{ checkin.humor }}
+                                        {% endif %}
+                                    </p>
+                                    <small class="justificativa-data">{{ checkin.data|date:"d/m/Y" }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <p class="no-justificativas">Nenhum check-in registrado ainda.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico das emoções no diário -->
+                <div class="grafico-card">
+                    <h6 class="grafico-title">Gráfico das emoções no diário</h6>
+                    <div class="grafico-placeholder">
+                        <canvas id="grafico-diario" width="250" height="200"></canvas>
+                    </div>
+
+                    <!-- Entradas recentes do diário -->
+                    <div class="diario-recentes">
+                        <h6 class="diario-title">Entradas Recentes</h6>
+                        <div class="diario-list">
+                            {% if diarios_recentes %}
+                            {% for diario in diarios_recentes %}
+                            <div class="diario-item">
+                                <div class="diario-emoji">{{ diario.emocao }}</div>
+                                <div class="diario-content">
+                                    <p class="diario-titulo">{{ diario.titulo|default:"Sem título" }}</p>
+                                    <small class="diario-data">{{ diario.data_criacao|date:"d/m/Y" }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <p class="no-diarios">Nenhuma entrada de diário registrada ainda.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Função para selecionar usuário específico
+    function selecionarUsuario(usuarioId, usuarioNome) {
+        // Remove seleção anterior
+        document.querySelectorAll('.usuario-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+
+        // Adiciona seleção ao usuário clicado
+        event.target.closest('.usuario-card').classList.add('selected');
+
+        // Atualiza o formulário
+        document.getElementById('usuario_id').value = usuarioId;
+        document.getElementById('meta-target-text').textContent = `Adicionar meta para ${usuarioNome}`;
+
+        // Recarrega a página com o usuário selecionado
+        window.location.href = `?usuario_id=${usuarioId}&usuario_nome=${encodeURIComponent(usuarioNome)}`;
+    }
+
+    // Função para selecionar todos os usuários
+    function selecionarTodosUsuarios() {
+        // Remove seleção anterior
+        document.querySelectorAll('.usuario-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+
+        // Adiciona seleção à opção "todos"
+        document.querySelector('.todos-usuarios').classList.add('selected');
+
+        // Atualiza o formulário
+        document.getElementById('usuario_id').value = 'all';
+        document.getElementById('meta-target-text').textContent = 'Adicionar meta para todos os usuários';
+
+        // Recarrega a página sem usuário específico
+        window.location.href = window.location.pathname;
+    }
+
+    // Configuração dos gráficos com dados reais
+    document.addEventListener('DOMContentLoaded', function () {
+        // Dados de check-in (passados do Django)
+        const dadosCheckin = {
+            labels: ['😢', '😞', '😐', '😊', '😄'],
+            datasets: [{
+                data: [
+                    parseFloat('{{ dados_checkin.muito_triste|default:0 }}'),
+                    parseFloat('{{ dados_checkin.triste|default:0 }}'),
+                    parseFloat('{{ dados_checkin.neutro|default:0 }}'),
+                    parseFloat('{{ dados_checkin.feliz|default:0 }}'),
+                    parseFloat('{{ dados_checkin.muito_feliz|default:0 }}')
+                ],
+                backgroundColor: [
+                    '#ff6b6b',
+                    '#ffa726',
+                    '#ffee58',
+                    '#66bb6a',
+                    '#42a5f5'
+                ]
+            }]
+        };
+
+        // Dados de diário (passados do Django)
+        const dadosDiario = {
+            labels: ['😢', '😞', '😐', '😊', '😄'],
+            datasets: [{
+                data: [
+                    parseFloat("{{ dados_checkin.muito_triste|default:'0' }}"),
+                    parseFloat("{{ dados_checkin.triste|default:'0' }}"),
+                    parseFloat("{{ dados_checkin.neutro|default:'0' }}"),
+                    parseFloat("{{ dados_checkin.feliz|default:'0' }}"),
+                    parseFloat("{{ dados_checkin.muito_feliz|default:'0' }}"),
+
+                ],
+                backgroundColor: [
+                    '#ff6b6b',
+                    '#ffa726',
+                    '#ffee58',
+                    '#66bb6a',
+                    '#42a5f5'
+                ]
+            }]
+        };
+
+        // Configuração comum dos gráficos
+        const configGrafico = {
+            type: 'doughnut',
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 10,
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Criar gráfico de check-in
+        const ctxCheckin = document.getElementById('grafico-checkin').getContext('2d');
+        new Chart(ctxCheckin, {
+            ...configGrafico,
+            data: dadosCheckin
+        });
+
+        // Criar gráfico de diário
+        const ctxDiario = document.getElementById('grafico-diario').getContext('2d');
+        new Chart(ctxDiario, {
+            ...configGrafico,
+            data: dadosDiario
+        });
+    });
+</script>
+{% endblock %}

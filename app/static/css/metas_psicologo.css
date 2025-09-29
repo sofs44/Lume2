@@ -1,0 +1,588 @@
+/* CSS para a página de metas do psicólogo - Projeto Lume (Refatorado) */
+
+.psicologo-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Seção de usuários (coluna lateral esquerda) - Nova estrutura em cards */
+.usuarios-section {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    height: fit-content;
+}
+
+.usuarios-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 2px solid #e8f5e8;
+    padding-bottom: 10px;
+}
+
+.usuarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.usuario-card {
+    background: #c8e6c9; /* Verde claro como na imagem */
+    border: 2px solid #a5d6a7;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.usuario-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+    background: #b8d4ba;
+    border-color: #81c784;
+}
+
+.usuario-card.selected {
+    background: #81c784;
+    border-color: #66bb6a;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+}
+
+.usuario-card.selected::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4caf50, #66bb6a);
+}
+
+.usuario-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #4caf50;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 auto 10px;
+    transition: all 0.3s ease;
+}
+
+.usuario-card:hover .usuario-avatar {
+    transform: scale(1.1);
+    background: #388e3c;
+}
+
+.usuario-card.selected .usuario-avatar {
+    background: #2e7d32;
+    transform: scale(1.1);
+}
+
+.todos-avatar {
+    background: #ff9800 !important;
+    font-size: 1rem !important;
+}
+
+.usuario-card:hover .todos-avatar {
+    background: #f57c00 !important;
+}
+
+.usuario-card.selected .todos-avatar {
+    background: #ef6c00 !important;
+}
+
+.usuario-nome {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #2e7d32;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+.usuario-card.selected .usuario-nome {
+    color: #1b5e20;
+    font-weight: 600;
+}
+
+.todos-usuarios {
+    border: 2px dashed #ff9800 !important;
+    background: #fff3e0 !important;
+}
+
+.todos-usuarios .usuario-nome {
+    color: #e65100 !important;
+}
+
+.todos-usuarios.selected {
+    border: 2px solid #ff9800 !important;
+    background: #ffe0b2 !important;
+}
+
+.todos-usuarios.selected .usuario-nome {
+    color: #bf360c !important;
+}
+
+/* Seção principal de metas */
+.metas-section {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Formulário para adicionar meta - Simplificado */
+.adicionar-meta-form {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.form-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.meta-form .form-group {
+    margin-bottom: 15px;
+}
+
+.meta-textarea {
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+    width: 100%;
+}
+
+.meta-textarea:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+    outline: none;
+}
+
+.btn-adicionar {
+    width: 100%;
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    background: #28a745;
+    color: white;
+}
+
+.btn-adicionar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    background: #218838;
+}
+
+/* Lista de metas existentes */
+.metas-existentes {
+    margin-top: 25px;
+}
+
+.metas-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e8f5e8;
+    padding-bottom: 10px;
+}
+
+.meta-card {
+    background: #c8e6c9; /* Verde claro como na imagem */
+    border: 1px solid #a5d6a7;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.meta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    background: #b8d4ba;
+}
+
+.meta-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #4caf50;
+    border-radius: 10px 0 0 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.meta-card:hover::before {
+    opacity: 1;
+}
+
+.meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.meta-usuario {
+    font-weight: 600;
+    color: #2e7d32;
+    font-size: 0.95rem;
+}
+
+.meta-status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-concluida {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-aberta,
+.status-em_progresso {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.meta-content {
+    margin-top: 10px;
+}
+
+.meta-descricao {
+    color: #2e7d32;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.meta-data {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* Seção de gráficos (coluna lateral direita) */
+.graficos-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.grafico-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.grafico-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-align: center;
+    background: #c8e6c9;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #a5d6a7;
+}
+
+.grafico-placeholder {
+    height: 200px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+/* Justificativas e entradas recentes */
+.justificativas-recentes,
+.diario-recentes {
+    margin-top: 15px;
+    border-top: 1px solid #e9ecef;
+    padding-top: 15px;
+}
+
+.justificativas-title,
+.diario-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.justificativas-list,
+.diario-list {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.justificativa-item,
+.diario-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.justificativa-item:hover,
+.diario-item:hover {
+    background: #e9ecef;
+    transform: translateX(3px);
+}
+
+.justificativa-emoji,
+.diario-emoji {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.justificativa-content,
+.diario-content {
+    flex: 1;
+}
+
+.justificativa-texto,
+.diario-titulo {
+    font-size: 0.8rem;
+    color: #495057;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.justificativa-data,
+.diario-data {
+    font-size: 0.7rem;
+    color: #6c757d;
+}
+
+/* Estados vazios */
+.no-metas,
+.no-justificativas,
+.no-diarios {
+    text-align: center;
+    padding: 30px 20px;
+    color: #6c757d;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px dashed #dee2e6;
+}
+
+.no-metas p,
+.no-justificativas,
+.no-diarios {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .psicologo-container {
+        padding: 15px;
+    }
+    
+    .usuarios-section {
+        margin-bottom: 20px;
+    }
+    
+    .usuarios-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+    }
+    
+    .usuario-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .usuario-nome {
+        font-size: 0.8rem;
+    }
+    
+    .graficos-section {
+        margin-top: 20px;
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .grafico-card {
+        flex: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .usuarios-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .graficos-section {
+        flex-direction: column;
+    }
+    
+    .meta-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .adicionar-meta-form {
+        padding: 15px;
+    }
+    
+    .metas-section {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .usuarios-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-title {
+        font-size: 1rem;
+    }
+    
+    .meta-textarea {
+        font-size: 0.9rem;
+    }
+    
+    .grafico-title {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+    
+    .justificativa-item,
+    .diario-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
+
+/* Animações */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.meta-card {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes cardPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.usuario-card.selected {
+    animation: cardPulse 0.6s ease;
+}
+
+/* Scrollbar customizada */
+.justificativas-list::-webkit-scrollbar,
+.diario-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.justificativas-list::-webkit-scrollbar-track,
+.diario-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+}
+
+.justificativas-list::-webkit-scrollbar-thumb,
+.diario-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+.justificativas-list::-webkit-scrollbar-thumb:hover,
+.diario-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Melhorias visuais adicionais */
+.usuario-card::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+}
+
+.usuario-card:active::after {
+    width: 100px;
+    height: 100px;
+}
+
+/* Estados de foco para acessibilidade */
+.usuario-card:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.btn-adicionar:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}

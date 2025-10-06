@@ -9,7 +9,6 @@ TIPO_CHOICES = [
 class Usuario(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome do usuário")
     email = models.EmailField(max_length=100, unique=True, verbose_name="E-mail do usuário")
-    senha = models.CharField(max_length=10, verbose_name="Senha do usuário")
     data_nasc = models.DateField(verbose_name="Data de nascimento")
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='usuario')
@@ -84,13 +83,19 @@ class FraseMotivacional(models.Model):
         verbose_name_plural = "Frases Motivacionais"
 
 class Notificacao(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    mensagem = models.CharField(max_length=255)
+    id_notificacao = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name='notificacoes')
+    meta = models.ForeignKey(MetaTerapeutica, on_delete=models.CASCADE, null=True, blank=True)
     lida = models.BooleanField(default=False)
     data_criacao = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        db_table = 'notificacoes'
+
     def __str__(self):
-        return f"Notificação para {self.usuario.nome} - {'Lida' if self.lida else 'Não lida'}"
+        return f"Notificação para {self.usuario.nome} - Meta: {self.meta.descricao if self.meta else 'Sem meta'}"
+
+
     
 class FraseFavorita(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)

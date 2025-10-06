@@ -123,13 +123,7 @@
                                     {% else %}😐{% endif %}
                                 </div>
                                 <div class="justificativa-content">
-                                    <p class="justificativa-texto">
-                                        {% if ' - ' in checkin.humor %}
-                                        {{ checkin.humor|split:' - '|last }}
-                                        {% else %}
-                                        {{ checkin.humor }}
-                                        {% endif %}
-                                    </p>
+                                    <p class="justificativa-texto">{{ checkin.justificativa }}</p>
                                     <small class="justificativa-data">{{ checkin.data|date:"d/m/Y" }}</small>
                                 </div>
                             </div>
@@ -178,7 +172,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Função para selecionar usuário específico
-    function selecionarUsuario(usuarioId, usuarioNome) {
+    function selecionarUsuario(usuarioId, usuarioNome, ) {
         // Remove seleção anterior
         document.querySelectorAll('.usuario-card').forEach(card => {
             card.classList.remove('selected');
@@ -220,8 +214,8 @@
             labels: ['😢', '😞', '😐', '😊', '😄'],
             datasets: [{
                 data: [
-                    parseFloat('{{ dados_checkin.muito_triste|default:0 }}'),
-                    parseFloat('{{ dados_checkin.triste|default:0 }}'),
+                    parseFloat("{{ dados_checkin.muito_triste|default:'0' }}"),
+                    parseFloat("{{ dados_checkin.triste|default:'0' }}"),
                     parseFloat('{{ dados_checkin.neutro|default:0 }}'),
                     parseFloat('{{ dados_checkin.feliz|default:0 }}'),
                     parseFloat('{{ dados_checkin.muito_feliz|default:0 }}')
@@ -241,12 +235,11 @@
             labels: ['😢', '😞', '😐', '😊', '😄'],
             datasets: [{
                 data: [
-                    parseFloat("{{ dados_checkin.muito_triste|default:'0' }}"),
-                    parseFloat("{{ dados_checkin.triste|default:'0' }}"),
-                    parseFloat("{{ dados_checkin.neutro|default:'0' }}"),
-                    parseFloat("{{ dados_checkin.feliz|default:'0' }}"),
-                    parseFloat("{{ dados_checkin.muito_feliz|default:'0' }}"),
-
+                    parseFloat("{{ dados_diario.muito_triste|default:'0' }}"),
+                    parseFloat("{{ dados_diario.triste|default:'0' }}"),
+                    parseFloat("{{ dados_diario.neutro|default:'0' }}"),
+                    parseFloat("{{ dados_diario.feliz|default:'0' }}"),
+                    parseFloat("{{ dados_diario.muito_feliz|default:'0' }}")
                 ],
                 backgroundColor: [
                     '#ff6b6b',

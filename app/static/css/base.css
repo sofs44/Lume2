@@ -91,3 +91,11 @@ footer a, footer strong {
   color: #fff !important;
   text-decoration: underline;
 }
+
+.fechar-notificacao {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  float: right;
+  cursor: pointer;
+}

@@ -171,3 +171,14 @@ footer {
     height: auto;
   }
 }
+
+.alert {
+    border-radius: 5px;
+    padding: 15px;
+    margin: 20px;
+    font-size: 16px;
+    background-color: #d4f0f9;
+    color: #004085;
+    border: 1px solid #bee5eb;
+    position: relative;
+}

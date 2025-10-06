@@ -26,7 +26,7 @@
           </div>
         </div>
       </a>
-    </div> 
+    </div>
 
     <div class="col-md-3 mb-4">
       <a href="{% if user.is_authenticated %}{% url 'diario' %}{% else %}{% url 'auth' %}{% endif %}"
@@ -41,8 +41,7 @@
     </div>
 
     <div class="col-md-3 mb-4">
-      <a href="{% url 'conteudo' %}"
-        style="text-decoration:none;color:inherit;">
+      <a href="{% url 'conteudo' %}" style="text-decoration:none;color:inherit;">
         <div class="card shadow">
           <div class="card-body">
             <h5>Conteúdo educativo</h5>
@@ -54,4 +53,48 @@
 
   </div>
 </div>
+
+{# NOTIFICAÇÕES #}
+{% if user.is_authenticated and user.usuario.tipo == 'usuario' %}
+  {% for notif in notificacoes %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert" id="notificacao-{{ notif.id_notificacao }}">
+      <a href="{% url 'metas' %}" style="text-decoration: none; color: inherit;">
+        <strong>Você tem uma nova meta.</strong><br>
+        {{ notif.meta.descricao|default:"(Sem descrição)" }}
+      </a>
+      <button type="button" class="fechar-notificacao" data-id="{{ notif.id_notificacao }}">✖</button>
+    </div>
+  {% empty %}
+    <p>Você não possui novas notificações.</p>
+  {% endfor %}
+{% endif %}
+
+<script>
+document.querySelectorAll('.fechar-notificacao').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const notifId = this.getAttribute('data-id');
+    const alertDiv = this.closest('.alert');
+
+    fetch(`/notificacao/lida/${notifId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Accept': 'application/json'
+      }
+    }).then(res => {
+      if (res.ok) {
+        alertDiv.remove();  // Remove a notificação da tela
+      } else {
+        console.error("Erro ao marcar como lida");
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+
 {% endblock %}

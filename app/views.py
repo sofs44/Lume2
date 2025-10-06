@@ -82,17 +82,14 @@ class AuthView(View):
 
     def post(self, request):
         # LOGIN
-        if 'btn-login' in request.POST:
+        if request.GET.get('tipo') == 'login':
             login_form = LoginForm(request.POST)
             cadastro_form = CadastroForm()
             if login_form.is_valid():
                 user = login_form.cleaned_data['user_obj']
                 login(request, user)
                 perfil = user.usuario
-                if perfil.tipo == 'psicologo':
-                    return redirect('metas_psicologo')  # ou outra página inicial para psicólogo
-                else:
-                    return redirect('index')
+                return redirect('index')
             return render(request, 'auth.html', {
                 'login_form': login_form,
                 'cadastro_form': cadastro_form
@@ -135,9 +132,23 @@ class AuthView(View):
 class IndexView(View):
     def get(self, request):
         frase = FraseMotivacional.objects.order_by('?').first()
+        frase_texto = frase.texto if frase else "Seja bem-vindo ao Lume!"
+
+        notificacoes = []
+
+        if request.user.is_authenticated:
+            try:
+                perfil = request.user.usuario
+                if perfil.tipo == 'usuario':  # Só para usuários comuns
+                    notificacoes = Notificacao.objects.filter(usuario=perfil, lida=False)
+            except Usuario.DoesNotExist:
+                pass  # Se não tiver perfil associado, ignora
+
         return render(request, 'index.html', {
-            "frase": frase.texto if frase else "Seja bem-vindo ao Lume!"
+            "frase": frase_texto,
+            "notificacoes": notificacoes
         })
+
 
 @method_decorator(login_required, name='dispatch')
 class DiarioView(View):
@@ -155,6 +166,20 @@ class ConteudoView(View):
         return render(request, 'conteudo.html')
 
 # ----------------- FUNÇÕES -----------------
+from django.http import JsonResponse
+
+@login_required
+def marcar_notificacao_lida(request, notif_id):
+    if request.method == "POST":
+        try:
+            notificacao = Notificacao.objects.get(id_notificacao=notif_id, usuario__user=request.user)
+            notificacao.lida = True
+            notificacao.save()
+            return JsonResponse({'status': 'ok'})
+        except Notificacao.DoesNotExist:
+            return JsonResponse({'status': 'erro', 'mensagem': 'Notificação não encontrada'}, status=404)
+    return JsonResponse({'status': 'erro', 'mensagem': 'Método inválido'}, status=400)
+
 
 @login_required
 def criar_diario(request):
@@ -169,7 +194,7 @@ def criar_diario(request):
 
 @login_required
 def listar_notificacoes(request):
-    notificacoes = Notificacao.objects.filter(usuario__user=request.user).order_by('-data_criacao')
+    notificacoes = Notificacao.objects.filter(usuario=request.user, lida=False)
     return render(request, 'notificacoes.html', {'notificacoes': notificacoes})
 
 @login_required
@@ -262,10 +287,10 @@ def metas_psicologo(request):
         'feliz': 0,
         'muito_feliz': 0
     }
-    
-    for checkin in CheckinEmocional.objects.filter(
-        usuario=usuario_selecionado if usuario_selecionado else Usuario.objects.filter(tipo='usuario')
-    ):
+    checkins_queryset = CheckinEmocional.objects.filter(
+    usuario__in=[usuario_selecionado] if usuario_selecionado else Usuario.objects.filter(tipo='usuario')
+)
+    for checkin in checkins_queryset:
         humor_lower = checkin.humor.lower()
         if 'muito-triste' in humor_lower or 'muito triste' in humor_lower:
             dados_checkin['muito_triste'] += 1
@@ -289,9 +314,10 @@ def metas_psicologo(request):
         'muito_feliz': 0
     }
     
-    for diario in Diario.objects.filter(
-        usuario=usuario_selecionado if usuario_selecionado else Usuario.objects.filter(tipo='usuario')
-    ):
+    diarios_queryset = Diario.objects.filter(
+    usuario__in=[usuario_selecionado] if usuario_selecionado else Usuario.objects.filter(tipo='usuario')
+)
+    for diario in diarios_queryset:
         emocao = diario.emocao
         if emocao == '😢':
             dados_diario['muito_triste'] += 1
@@ -337,6 +363,12 @@ def metas_psicologo(request):
                 messages.error(request, "Usuário selecionado inválido.")
 
         return redirect('metas_psicologo')
+
+    for checkin in checkins_usuario:
+        if ' - ' in checkin.humor:
+            checkin.justificativa = checkin.humor.split(' - ')[-1].strip()
+        else:
+            checkin.justificativa = checkin.humor
 
     context = {
         'usuarios': usuarios,

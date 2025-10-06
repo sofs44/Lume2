@@ -2,6 +2,7 @@ from django.urls import path, include
 from django.contrib import admin
 from app.views import AuthView, IndexView, ConteudoView, CheckinView, DiarioView, criar_diario, DeleteDiarioView, EditDiarioView, listar_notificacoes, minhas_favoritas, metas_checkin_redirect, metas_psicologo, metas_usuario
 from django.contrib.auth import views as auth_views
+from app.views import marcar_notificacao_lida 
 
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path('metas/', metas_checkin_redirect, name='metas'),
     path('metas/psicologo/', metas_psicologo, name='metas_psicologo'),
     path('metas/usuario/', metas_usuario, name='metas_usuario'),
+    path('notificacao/lida/<int:notif_id>/', marcar_notificacao_lida, name='notificacao_lida'),
 ]

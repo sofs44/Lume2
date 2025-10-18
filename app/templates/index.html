@@ -5,8 +5,18 @@
 
 {% block content %}
 <div class="container mt-5">
-  <div class="jumbotron-custom text-center">
-    <h1 class="display-4">{{ frase }}</h1>
+  <div class="jumbotron-custom text-center position-relative">
+    {% if frase %}
+    <h1 class="display-4">{{ frase.texto }}</h1>
+    {% if user.is_authenticated %}
+    <button class="btn btn-link p-0 position-absolute" style="top:10px; right:10px; font-size:24px; color:red;"
+      id="btn-favoritar" data-id="{{ frase.id }}">
+      ❤️
+    </button>
+    {% endif %}
+    {% else %}
+    <h1 class="display-4">Seja bem-vindo ao Lume!</h1>
+    {% endif %}
     <p class="lead">Esta é a página inicial do Lume</p>
     <p class="lead">Seja Bem Vindo(A)</p>
   </div>
@@ -56,39 +66,64 @@
 
 {# NOTIFICAÇÕES #}
 {% if user.is_authenticated and user.usuario.tipo == 'usuario' %}
-  {% for notif in notificacoes %}
-    <div class="alert alert-info alert-dismissible fade show" role="alert" id="notificacao-{{ notif.id_notificacao }}">
-      <a href="{% url 'metas' %}" style="text-decoration: none; color: inherit;">
-        <strong>Você tem uma nova meta.</strong><br>
-        {{ notif.meta.descricao|default:"(Sem descrição)" }}
-      </a>
-      <button type="button" class="fechar-notificacao" data-id="{{ notif.id_notificacao }}">✖</button>
-    </div>
-  {% empty %}
-    <p>Você não possui novas notificações.</p>
-  {% endfor %}
+{% for notif in notificacoes %}
+<div class="alert alert-info alert-dismissible fade show" role="alert" id="notificacao-{{ notif.id_notificacao }}">
+  <a href="{% url 'metas' %}" style="text-decoration: none; color: inherit;">
+    <strong>Você tem uma nova meta.</strong><br>
+    {{ notif.meta.descricao|default:"(Sem descrição)" }}
+  </a>
+  <button type="button" class="fechar-notificacao" data-id="{{ notif.id_notificacao }}">✖</button>
+</div>
+{% empty %}
+<p>Você não possui novas notificações.</p>
+{% endfor %}
 {% endif %}
 
 <script>
-document.querySelectorAll('.fechar-notificacao').forEach(btn => {
-  btn.addEventListener('click', function () {
-    const notifId = this.getAttribute('data-id');
-    const alertDiv = this.closest('.alert');
+  document.querySelectorAll('.fechar-notificacao').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const notifId = this.getAttribute('data-id');
+      const alertDiv = this.closest('.alert');
 
-    fetch(`/notificacao/lida/${notifId}/`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': '{{ csrf_token }}',
-        'Accept': 'application/json'
-      }
-    }).then(res => {
-      if (res.ok) {
-        alertDiv.remove();  // Remove a notificação da tela
-      } else {
-        console.error("Erro ao marcar como lida");
-      }
+      fetch(`/notificacao/lida/${notifId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Accept': 'application/json'
+        }
+      }).then(res => {
+        if (res.ok) {
+          alertDiv.remove();  // Remove a notificação da tela
+        } else {
+          console.error("Erro ao marcar como lida");
+        }
+      });
     });
   });
+
+  document.addEventListener('DOMContentLoaded', function() {
+  const btn = document.getElementById('btn-favoritar');
+  if (btn) {
+    btn.addEventListener('click', function() {
+      const fraseId = this.getAttribute('data-id');
+      fetch("{% url 'favoritar_frase' %}", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'frase_id=' + fraseId
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.favoritada) {
+          alert('Frase adicionada aos favoritos ❤️');
+        } else {
+          alert('Frase removida dos favoritos 💔');
+        }
+      });
+    });
+  }
 });
 
 </script>

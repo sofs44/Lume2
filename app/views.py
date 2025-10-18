@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from .models import (
     Psicologo, Usuario, FraseMotivacional, Diario, CheckinEmocional,
-    MetaTerapeutica, Notificacao, FraseFavorita
+    MetaTerapeutica, Notificacao, FraseFavorita, Recompensa
 )
 from django.views.decorators.csrf import csrf_protect
 from django.utils.decorators import method_decorator
@@ -132,22 +132,21 @@ class AuthView(View):
 class IndexView(View):
     def get(self, request):
         frase = FraseMotivacional.objects.order_by('?').first()
-        frase_texto = frase.texto if frase else "Seja bem-vindo ao Lume!"
-
         notificacoes = []
 
         if request.user.is_authenticated:
             try:
                 perfil = request.user.usuario
-                if perfil.tipo == 'usuario':  # Só para usuários comuns
+                if perfil.tipo == 'usuario':
                     notificacoes = Notificacao.objects.filter(usuario=perfil, lida=False)
             except Usuario.DoesNotExist:
-                pass  # Se não tiver perfil associado, ignora
+                pass
 
         return render(request, 'index.html', {
-            "frase": frase_texto,
+            "frase": frase,
             "notificacoes": notificacoes
         })
+
 
 
 @method_decorator(login_required, name='dispatch')
@@ -388,20 +387,31 @@ def metas_usuario(request):
     perfil = request.user.usuario
     metas = MetaTerapeutica.objects.filter(usuario=perfil).order_by('-data_criacao')
 
+    # Calcula pontos totais do usuário
+    total_pontos = Recompensa.objects.filter(usuario=perfil).count() * 10
+
     if request.method == 'POST':
-        # 1. Marcar meta concluída
+        # 1️⃣ Marcar meta concluída
         if request.POST.get('marcar_concluida'):
             meta_id = request.POST.get('meta_id')
             try:
                 meta = MetaTerapeutica.objects.get(id=meta_id, usuario=perfil)
-                meta.status = 'concluida'
-                meta.save()
-                messages.success(request, "Meta marcada como concluída.")
+                if meta.status != 'concluida':  # evita marcar de novo
+                    meta.status = 'concluida'
+                    meta.save()
+
+                    # Cria recompensa de 10 pontos
+                    Recompensa.objects.create(
+                        usuario=perfil,
+                        descricao=f"Concluiu a meta: {meta.descricao}"
+                    )
+
+                    messages.success(request, "🎉 Parabéns! Você ganhou 10 pontos por concluir uma meta!")
             except MetaTerapeutica.DoesNotExist:
                 messages.error(request, "Meta inválida.")
             return redirect('metas_usuario')
 
-        # 2. Salvar check-in emocional
+        # 2️⃣ Salvar check-in emocional
         if request.POST.get('humor'):
             humor = request.POST.get('humor')
             justificativa = request.POST.get('justificativa', '').strip()
@@ -412,8 +422,24 @@ def metas_usuario(request):
             messages.success(request, "Check-in salvo com sucesso!")
             return redirect('metas_usuario')
 
-        # 3. Caso nenhum dos dois
         messages.error(request, "Formulário inválido.")
         return redirect('metas_usuario')
 
-    return render(request, 'metas_usuario.html', {'metas': metas})
+    # Renderiza a página com total de pontos
+    return render(request, 'metas_usuario.html', {
+        'metas': metas,
+        'total_pontos': total_pontos
+    })
+
+
+@login_required
+def favoritar_frase(request):
+    if request.method == 'POST':
+        frase_id = request.POST.get('frase_id')
+        frase = get_object_or_404(FraseMotivacional, id=frase_id)
+        favorita, criada = FraseFavorita.objects.get_or_create(usuario=request.user, frase=frase)
+        if not criada:
+            favorita.delete()  # desfavorita
+            return JsonResponse({'favoritada': False})
+        return JsonResponse({'favoritada': True})
+    return JsonResponse({'error': 'Método inválido'}, status=400)

@@ -103,3 +103,23 @@ class FraseFavorita(models.Model):
     data_adicionada = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f'{self.usuario.username} - {self.frase.texto[:30]}'
+
+class Recompensa(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    descricao = models.CharField(max_length=255)
+    data = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.usuario.nome} - {self.descricao}"
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=MetaTerapeutica)
+def criar_recompensa(sender, instance, **kwargs):
+    # Se a meta estiver concluída e o usuário ainda não recebeu recompensa
+    if instance.status.lower() == "concluída":
+        Recompensa.objects.create(
+            usuario=instance.usuario,
+            descricao=f"Concluiu a meta: {instance.descricao}"
+        )

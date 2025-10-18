@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Usuario, Psicologo, Diario, CheckinEmocional, MetaTerapeutica,
-    FraseMotivacional, Notificacao, FraseFavorita
+    FraseMotivacional, Notificacao, FraseFavorita, Recompensa
 )
 
 
@@ -61,3 +61,8 @@ class FraseFavoritaAdmin(admin.ModelAdmin):
     list_display = ('usuario', 'frase', 'data_adicionada')
     list_filter = ('usuario',)
     search_fields = ('usuario__username', 'frase__texto')
+
+@admin.register(Recompensa)
+class RecompensaAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'descricao', 'data')
+    list_filter = ('usuario',)

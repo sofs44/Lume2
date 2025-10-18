@@ -11,37 +11,43 @@
 
 {% block content %}
 <div class="metas-container">
+    <div class="pontos-usuario mb-4 text-center">
+        <h4>Seus pontos: {{ total_pontos }}</h4>
+        <p class="text-muted">Você ganha 10 pontos por cada meta concluída.</p>
+    </div>
+
     <div class="row">
         <!-- Coluna principal com as metas -->
         <div class="col-lg-8 col-md-12">
             <div class="metas-section">
                 {% if metas %}
-                    {% for meta in metas %}
-                    <div class="meta-item {% if meta.status == 'concluida' %}completed{% endif %}">
-                        <div class="meta-content">
-                            <h5 class="meta-title">{{ meta.descricao }}</h5>
-                            <p class="meta-description">Criada em {{ meta.data_criacao|date:"d/m/Y" }}</p>
-                        </div>
-                        <div class="meta-checkbox">
-                            {% if meta.status == 'concluida' %}
-                                <input type="checkbox" id="meta{{ meta.id }}" class="custom-checkbox" checked disabled>
-                                <label for="meta{{ meta.id }}" class="checkbox-label"></label>
-                            {% else %}
-                                <form method="post" class="meta-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="meta_id" value="{{ meta.id }}">
-                                    <input type="checkbox" id="meta{{ meta.id }}" class="custom-checkbox" name="marcar_concluida" value="1" onchange="this.form.submit()">
-                                    <label for="meta{{ meta.id }}" class="checkbox-label"></label>
-                                </form>
-                            {% endif %}
-                        </div>
+                {% for meta in metas %}
+                <div class="meta-item {% if meta.status == 'concluida' %}completed{% endif %}">
+                    <div class="meta-content">
+                        <h5 class="meta-title">{{ meta.descricao }}</h5>
+                        <p class="meta-description">Criada em {{ meta.data_criacao|date:"d/m/Y" }}</p>
                     </div>
-                    {% endfor %}
+                    <div class="meta-checkbox">
+                        {% if meta.status == 'concluida' %}
+                        <input type="checkbox" id="meta{{ meta.id }}" class="custom-checkbox" checked disabled>
+                        <label for="meta{{ meta.id }}" class="checkbox-label"></label>
+                        {% else %}
+                        <form method="post" class="meta-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="meta_id" value="{{ meta.id }}">
+                            <input type="checkbox" id="meta{{ meta.id }}" class="custom-checkbox"
+                                name="marcar_concluida" value="1" onchange="this.form.submit()">
+                            <label for="meta{{ meta.id }}" class="checkbox-label"></label>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
                 {% else %}
-                    <div class="no-metas">
-                        <p>Você ainda não possui metas definidas pelo seu psicólogo.</p>
-                        <p>Entre em contato com seu terapeuta para definir suas metas terapêuticas.</p>
-                    </div>
+                <div class="no-metas">
+                    <p>Você ainda não possui metas definidas pelo seu psicólogo.</p>
+                    <p>Entre em contato com seu terapeuta para definir suas metas terapêuticas.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -51,21 +57,23 @@
             <div class="mood-section">
                 <h6 class="mood-title">Como você está se sentindo hoje?</h6>
                 <div class="mood-emojis">
-                    <div class="emoji-option" data-mood="muito-triste" onclick="mostrarJustificativa('muito-triste')">😢</div>
+                    <div class="emoji-option" data-mood="muito-triste" onclick="mostrarJustificativa('muito-triste')">😢
+                    </div>
                     <div class="emoji-option" data-mood="triste" onclick="mostrarJustificativa('triste')">😞</div>
                     <div class="emoji-option" data-mood="neutro" onclick="mostrarJustificativa('neutro')">😐</div>
                     <div class="emoji-option" data-mood="feliz" onclick="mostrarJustificativa('feliz')">😊</div>
-                    <div class="emoji-option" data-mood="muito-feliz" onclick="mostrarJustificativa('muito-feliz')">😄</div>
+                    <div class="emoji-option" data-mood="muito-feliz" onclick="mostrarJustificativa('muito-feliz')">😄
+                    </div>
                 </div>
-                
+
                 <!-- Caixa de texto para justificativa -->
                 <div id="justificativa-container" class="justificativa-container" style="display: none;">
-                  <form method="post" action="{% url 'metas_usuario' %}" class="checkin-form">
+                    <form method="post" action="{% url 'metas_usuario' %}" class="checkin-form">
                         {% csrf_token %}
                         <input type="hidden" id="humor-selecionado" name="humor" value="">
                         <label for="justificativa" class="justificativa-label">Por que você se sente assim?</label>
-                        <textarea id="justificativa" name="justificativa" class="justificativa-textarea" 
-                                  placeholder="Descreva o que está sentindo..." rows="4"></textarea>
+                        <textarea id="justificativa" name="justificativa" class="justificativa-textarea"
+                            placeholder="Descreva o que está sentindo..." rows="4"></textarea>
                         <div class="checkin-buttons">
                             <button type="submit" class="btn-salvar">Salvar Check-in</button>
                             <button type="button" class="btn-cancelar" onclick="cancelarCheckin()">Cancelar</button>
@@ -76,67 +84,116 @@
         </div>
     </div>
 </div>
+
+<div class="favoritas-section mt-5">
+    <h5>Suas frases favoritas</h5>
+    <ul id="lista-favoritas">
+        {% for fav in request.user.frasefavorita_set.all %}
+        <li id="fav-{{ fav.frase.id }}">
+            {{ fav.frase.texto }}
+            <button class="btn-remover-fav" data-frase-id="{{ fav.frase.id }}">❌</button>
+        </li>
+        {% empty %}
+        <li id="sem-favoritas">Você ainda não favoritou nenhuma frase.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function mostrarJustificativa(humor) {
-    // Remove seleção anterior
-    document.querySelectorAll('.emoji-option').forEach(emoji => {
-        emoji.classList.remove('selected');
-    });
-    
-    // Adiciona seleção ao emoji clicado
-    document.querySelector(`[data-mood="${humor}"]`).classList.add('selected');
-    
-    // Define o humor selecionado no campo hidden
-    document.getElementById('humor-selecionado').value = humor;
-    
-    // Mostra a caixa de justificativa
-    document.getElementById('justificativa-container').style.display = 'block';
-    
-    // Foca no textarea
-    document.getElementById('justificativa').focus();
-}
+    function mostrarJustificativa(humor) {
+        // Remove seleção anterior
+        document.querySelectorAll('.emoji-option').forEach(emoji => {
+            emoji.classList.remove('selected');
+        });
 
-function cancelarCheckin() {
-    // Esconde a caixa de justificativa
-    document.getElementById('justificativa-container').style.display = 'none';
-    
-    // Remove seleção dos emojis
-    document.querySelectorAll('.emoji-option').forEach(emoji => {
-        emoji.classList.remove('selected');
-    });
-    
-    // Limpa os campos
-    document.getElementById('humor-selecionado').value = '';
-    document.getElementById('justificativa').value = '';
-}
+        // Adiciona seleção ao emoji clicado
+        document.querySelector(`[data-mood="${humor}"]`).classList.add('selected');
 
-// Funcionalidade adicional para melhorar a experiência
-document.addEventListener('DOMContentLoaded', function() {
-    // Adiciona efeito hover nos emojis
-    document.querySelectorAll('.emoji-option').forEach(emoji => {
-        emoji.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.2)';
-        });
-        
-        emoji.addEventListener('mouseleave', function() {
-            if (!this.classList.contains('selected')) {
-                this.style.transform = 'scale(1)';
-            }
-        });
-    });
-    
-    // Adiciona animação suave ao mostrar a caixa de justificativa
-    const container = document.getElementById('justificativa-container');
-    if (container) {
-        container.addEventListener('transitionend', function() {
-            if (this.style.display !== 'none') {
-                this.querySelector('textarea').focus();
-            }
-        });
+        // Define o humor selecionado no campo hidden
+        document.getElementById('humor-selecionado').value = humor;
+
+        // Mostra a caixa de justificativa
+        document.getElementById('justificativa-container').style.display = 'block';
+
+        // Foca no textarea
+        document.getElementById('justificativa').focus();
     }
-});
+
+    function cancelarCheckin() {
+        // Esconde a caixa de justificativa
+        document.getElementById('justificativa-container').style.display = 'none';
+
+        // Remove seleção dos emojis
+        document.querySelectorAll('.emoji-option').forEach(emoji => {
+            emoji.classList.remove('selected');
+        });
+
+        // Limpa os campos
+        document.getElementById('humor-selecionado').value = '';
+        document.getElementById('justificativa').value = '';
+    }
+
+    // Funcionalidade adicional para melhorar a experiência
+    document.addEventListener('DOMContentLoaded', function () {
+        // Adiciona efeito hover nos emojis
+        document.querySelectorAll('.emoji-option').forEach(emoji => {
+            emoji.addEventListener('mouseenter', function () {
+                this.style.transform = 'scale(1.2)';
+            });
+
+            emoji.addEventListener('mouseleave', function () {
+                if (!this.classList.contains('selected')) {
+                    this.style.transform = 'scale(1)';
+                }
+            });
+        });
+
+        // Adiciona animação suave ao mostrar a caixa de justificativa
+        const container = document.getElementById('justificativa-container');
+        if (container) {
+            container.addEventListener('transitionend', function () {
+                if (this.style.display !== 'none') {
+                    this.querySelector('textarea').focus();
+                }
+            });
+        }
+    });
+
+    document.querySelectorAll('.btn-remover-fav').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const fraseId = this.dataset.fraseId;
+
+            fetch("{% url 'favoritar_frase' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `frase_id=${fraseId}`
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.favoritada === false) {
+                        // remove a frase da lista
+                        document.getElementById(`fav-${fraseId}`).remove();
+
+                        // se a lista ficar vazia, mostra mensagem
+                        const lista = document.getElementById('lista-favoritas');
+                        if (lista.children.length === 0) {
+                            const li = document.createElement('li');
+                            li.id = 'sem-favoritas';
+                            li.textContent = "Você ainda não favoritou nenhuma frase.";
+                            lista.appendChild(li);
+                        }
+                    }
+                })
+                .catch(err => console.error("Erro ao desfavoritar:", err));
+        });
+    });
+
 </script>
 {% endblock %}

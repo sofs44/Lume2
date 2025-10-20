@@ -152,7 +152,8 @@ class IndexView(View):
 @method_decorator(login_required, name='dispatch')
 class DiarioView(View):
     def get(self, request):
-        diarios = Diario.objects.all().order_by('-data_criacao')
+        usuario = Usuario.objects.get(user=request.user)
+        diarios = Diario.objects.filter(usuario=usuario).order_by('-data_criacao')
         return render(request, 'diario.html', {'diarios': diarios, 'data_hoje': now().date()})
 
 class CheckinView(View):
